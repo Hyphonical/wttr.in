@@ -20,17 +20,8 @@ ENV JQ_INCLUDE_DIR=/usr/include JQ_LIBRARY=/usr/lib
 RUN /app/venv/bin/pip install --no-cache-dir -r requirements.txt && \
     apk del build-base autoconf automake pkgconfig jq-dev m4
 
-# Build wego substitute (Go part) from included share/we-lang (if still needed)
-FROM golang:1-alpine AS gobuild
-WORKDIR /goapp
-COPY --from=base /app/share/we-lang/ /goapp/
-RUN apk add --no-cache git && CGO_ENABLED=0 go build -o wttr.in .
-
 FROM base AS runtime
-# Copy compiled Go binary (acts as WTTR_WEGO helper)
-COPY --from=gobuild /goapp/wttr.in /app/bin/wttr.in
-
-# Copy venv from build stage
+# Copy venv and code from build stage
 COPY --from=base /app/venv /app/venv
 COPY --from=base /app/bin /app/bin
 COPY --from=base /app/lib /app/lib
@@ -46,7 +37,6 @@ RUN printf '[supervisord]\nnodaemon=true\n[program:wttr]\ncommand=/app/venv/bin/
 
 ENV WTTR_MYDIR=/app \
     WTTR_GEOLITE=/app/GeoLite2-City.mmdb \
-    WTTR_WEGO=/app/bin/wttr.in \
     WTTR_LISTEN_HOST=0.0.0.0 \
     WTTR_LISTEN_PORT=8002
 
