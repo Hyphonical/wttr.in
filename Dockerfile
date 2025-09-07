@@ -1,6 +1,6 @@
 # Minimal “self-contained” builder that does NOT require local source except this Dockerfile
-FROM alpine:3.21.1 AS base
-RUN apk add --no-cache git python3 py3-pip py3-gevent py3-wheel py3-scipy py3-numpy-dev python3-dev build-base jpeg-dev zlib-dev libtool supervisor autoconf automake pkgconfig jq jq-dev oniguruma-dev m4
+FROM python:3.11-alpine AS base  # use Python 3.11 because pyjq not yet compatible with 3.12
+RUN apk add --no-cache git build-base jpeg-dev zlib-dev libtool supervisor autoconf automake pkgconfig jq jq-dev oniguruma-dev m4 py3-scipy py3-numpy-dev
 
 WORKDIR /app
 # Fetch source (shallow clone)
@@ -15,10 +15,10 @@ RUN git clone --depth 1 --branch "$WTTR_REF" "$WTTR_REPO" src && \
 RUN grep -v '^numba$' requirements.txt > requirements.filtered && mv requirements.filtered requirements.txt
 
 # Create virtual environment and install Python deps
-RUN python3 -m venv /app/venv
+RUN python -m venv /app/venv
 ENV JQ_INCLUDE_DIR=/usr/include JQ_LIBRARY=/usr/lib
 RUN /app/venv/bin/pip install --no-cache-dir -r requirements.txt && \
-    apk del build-base python3-dev autoconf automake pkgconfig jq-dev m4
+    apk del build-base autoconf automake pkgconfig jq-dev m4
 
 # Build wego substitute (Go part) from included share/we-lang (if still needed)
 FROM golang:1-alpine AS gobuild
@@ -42,7 +42,7 @@ RUN mkdir -p /app/cache /var/log/supervisor /etc/supervisor/conf.d && \
     chmod -R o+rw /var/log/supervisor /var/run
 
 # Supervisor config (already in repo if fetched; fallback simple)
-RUN printf '[supervisord]\nnodaemon=true\n[program:wttr]\ncommand=/app/venv/bin/python3 /app/bin/srv.py\n' > /etc/supervisor/supervisord.conf
+RUN printf '[supervisord]\nnodaemon=true\n[program:wttr]\ncommand=/app/venv/bin/python /app/bin/srv.py\n' > /etc/supervisor/supervisord.conf
 
 ENV WTTR_MYDIR=/app \
     WTTR_GEOLITE=/app/GeoLite2-City.mmdb \
