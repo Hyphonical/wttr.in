@@ -10,9 +10,9 @@ RUN git clone --depth 1 --branch "$WTTR_REF" "$WTTR_REPO" src && \
     cp -r src/bin src/lib src/share ./ && \
     rm -rf src/.git
 
-# Install Python deps
-COPY requirements.txt /app/requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt && \
+# Create virtual environment and install Python deps
+RUN python3 -m venv /app/venv
+RUN /app/venv/bin/pip install --no-cache-dir -r requirements.txt && \
     apk del build-base llvm17-dev python3-dev
 
 # Build wego substitute (Go part) from included share/we-lang (if still needed)
@@ -30,7 +30,7 @@ RUN mkdir -p /app/cache /var/log/supervisor /etc/supervisor/conf.d && \
     chmod -R o+rw /var/log/supervisor /var/run
 
 # Supervisor config (already in repo if fetched; fallback simple)
-RUN printf '[supervisord]\nnodaemon=true\n[program:wttr]\ncommand=python3 /app/bin/srv.py\n' > /etc/supervisor/supervisord.conf
+RUN printf '[supervisord]\nnodaemon=true\n[program:wttr]\ncommand=/app/venv/bin/python3 /app/bin/srv.py\n' > /etc/supervisor/supervisord.conf
 
 ENV WTTR_MYDIR=/app \
     WTTR_GEOLITE=/app/GeoLite2-City.mmdb \
