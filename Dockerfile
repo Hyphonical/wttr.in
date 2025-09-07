@@ -8,6 +8,7 @@ ARG WTTR_REPO=https://github.com/chubin/wttr.in.git
 ARG WTTR_REF=master
 RUN git clone --depth 1 --branch "$WTTR_REF" "$WTTR_REPO" src && \
     cp -r src/bin src/lib src/share ./ && \
+    cp src/requirements.txt ./ && \
     rm -rf src/.git
 
 # Create virtual environment and install Python deps
