@@ -1,0 +1,38 @@
+# Exclude version control
+.git
+.gitignore
+
+# Exclude CI/CD and workflows
+.github
+
+# Exclude documentation and misc files
+README.md
+LICENSE
+*.md
+docs/
+
+# Exclude development files
+.vscode/
+.idea/
+*.log
+*.tmp
+
+# Exclude build artifacts and caches
+.cache/
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+
+# Exclude OS-specific files
+.DS_Store
+Thumbs.db
+
+# Exclude Docker-related files (to avoid recursion)
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Exclude large or irrelevant directories (adjust as needed)
+# If you have data files or logs not needed in the image, add them here
+# e.g., data/ or logs/
