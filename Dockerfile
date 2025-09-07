@@ -1,6 +1,6 @@
 # Minimal “self-contained” builder that does NOT require local source except this Dockerfile
 FROM alpine:3.21.1 AS base
-RUN apk add --no-cache git python3 py3-pip py3-gevent py3-wheel py3-scipy py3-numpy-dev python3-dev build-base jpeg-dev zlib-dev llvm17 llvm17-dev libtool supervisor
+RUN apk add --no-cache git python3 py3-pip py3-gevent py3-wheel py3-scipy py3-numpy-dev python3-dev build-base jpeg-dev zlib-dev llvm17 llvm17-dev libtool supervisor autoconf automake pkgconfig
 
 WORKDIR /app
 # Fetch source (shallow clone)
@@ -14,7 +14,7 @@ RUN git clone --depth 1 --branch "$WTTR_REF" "$WTTR_REPO" src && \
 # Create virtual environment and install Python deps
 RUN python3 -m venv /app/venv
 RUN /app/venv/bin/pip install --no-cache-dir -r requirements.txt && \
-    apk del build-base llvm17-dev python3-dev
+    apk del build-base llvm17-dev python3-dev autoconf automake pkgconfig
 
 # Build wego substitute (Go part) from included share/we-lang (if still needed)
 FROM golang:1-alpine AS gobuild
