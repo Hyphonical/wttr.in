@@ -13,6 +13,7 @@ RUN git clone --depth 1 --branch "$WTTR_REF" "$WTTR_REPO" src && \
 
 # Create virtual environment and install Python deps
 RUN python3 -m venv /app/venv
+ENV LLVM_CONFIG=/usr/bin/llvm-config
 RUN export PATH=$PATH:/usr/lib/llvm17/bin && /app/venv/bin/pip install --no-cache-dir -r requirements.txt && \
     apk del build-base llvm17-dev llvm17-static python3-dev autoconf automake pkgconfig jq-dev
 
