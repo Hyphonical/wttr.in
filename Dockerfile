@@ -1,5 +1,5 @@
 # Minimal “self-contained” builder that does NOT require local source except this Dockerfile
-FROM python:3.11-alpine AS base  # use Python 3.11 because pyjq not yet compatible with 3.12
+FROM python:3.11-alpine AS base
 RUN apk add --no-cache git build-base jpeg-dev zlib-dev libtool supervisor autoconf automake pkgconfig jq jq-dev oniguruma-dev m4 py3-scipy py3-numpy-dev
 
 WORKDIR /app
