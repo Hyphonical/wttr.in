@@ -1,6 +1,6 @@
 # Minimal “self-contained” builder that does NOT require local source except this Dockerfile
 FROM alpine:3.21.1 AS base
-RUN apk add --no-cache git python3 py3-pip py3-gevent py3-wheel py3-scipy py3-numpy-dev python3-dev build-base jpeg-dev zlib-dev libtool supervisor autoconf automake pkgconfig jq-dev oniguruma-dev m4
+RUN apk add --no-cache git python3 py3-pip py3-gevent py3-wheel py3-scipy py3-numpy-dev python3-dev build-base jpeg-dev zlib-dev libtool supervisor autoconf automake pkgconfig jq jq-dev oniguruma-dev m4
 
 WORKDIR /app
 # Fetch source (shallow clone)
@@ -16,6 +16,7 @@ RUN grep -v '^numba$' requirements.txt > requirements.filtered && mv requirement
 
 # Create virtual environment and install Python deps
 RUN python3 -m venv /app/venv
+ENV JQ_INCLUDE_DIR=/usr/include JQ_LIBRARY=/usr/lib
 RUN /app/venv/bin/pip install --no-cache-dir -r requirements.txt && \
     apk del build-base python3-dev autoconf automake pkgconfig jq-dev m4
 
