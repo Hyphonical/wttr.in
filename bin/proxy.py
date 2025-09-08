@@ -51,6 +51,7 @@ from globals import (
 )
 from metno import create_standard_json_from_metno, metno_request
 from translations import PROXY_LANGS
+from datasource_manager import datasource_manager
 
 # pylint: enable=wrong-import-position
 
@@ -315,6 +316,37 @@ def _fetch_content_and_headers(path, query_string, **kwargs):
 
 
 def _make_query(path, query_string):
+    """Make query using the datasource manager for load distribution."""
+    # Extract location from query
+    coord_match = re.search(r"q=[^&]*", query_string)
+    if not coord_match:
+        return "{}", {}
+
+    coords_str = coord_match.group(0)
+    coords = re.findall(r"[-0-9.]+", coords_str)
+    if len(coords) != 2:
+        return "{}", {}
+
+    location = f"{coords[0]},{coords[1]}"
+
+    # Extract days parameter
+    days_match = re.search(r"num_of_days=([0-9]+)", query_string)
+    days = int(days_match.group(1)) if days_match else 3
+
+    # Try to get data from datasource manager
+    data = datasource_manager.fetch_weather_data(location, days)
+
+    if data:
+        content = json.dumps(data)
+        headers = {"Content-Type": "application/json"}
+        return content, headers
+    else:
+        # Fallback to original implementation if all sources fail
+        return _make_query_fallback(path, query_string)
+
+
+def _make_query_fallback(path, query_string):
+    """Fallback to original implementation if datasource manager fails."""
     if _is_metno():
         path, query, days = metno_request(path, query_string)
         if USER_AGENT == "":
@@ -340,6 +372,8 @@ def _normalize_query_string(query_string):
     # 2. Limits number of digits after .
 
     coord_match = re.search(r"q=[^&]*", query_string)
+    if not coord_match:
+        return query_string
     coords_str = coord_match.group(0)
     coords = re.findall(r"[-0-9.]+", coords_str)
     if len(coords) != 2:

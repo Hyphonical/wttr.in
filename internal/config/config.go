@@ -117,7 +117,7 @@ type Nominatim struct {
 func Default() *Config {
 	return &Config{
 		Cache{
-			Size: 12800,
+			Size: 25600, // Increased from 12800 to handle more requests
 		},
 		Geo{
 			IPCache:           "/wttr.in/cache/ip2l",

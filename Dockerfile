@@ -38,7 +38,10 @@ RUN printf '[supervisord]\nnodaemon=true\n[program:wttr]\ncommand=/app/venv/bin/
 ENV WTTR_MYDIR=/app \
     WTTR_GEOLITE=/app/GeoLite2-City.mmdb \
     WTTR_LISTEN_HOST=0.0.0.0 \
-    WTTR_LISTEN_PORT=8002
+    WTTR_LISTEN_PORT=8002 \
+    OPENWEATHERMAP_API_KEY=${OPENWEATHERMAP_API_KEY:-} \
+    WEATHERAPI_KEY=${WEATHERAPI_KEY:-} \
+    ACCUWEATHER_API_KEY=${ACCUWEATHER_API_KEY:-}
 
 EXPOSE 8002
 VOLUME ["/app/cache"]

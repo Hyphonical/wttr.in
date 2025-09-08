@@ -6,7 +6,7 @@ services:
     # 🐳 Container name
     container_name: Wttr.in
     restart: unless-stopped
-    # 🔑 Pass runtime configuration from your .env file
+    # 🔑 Load environment variables from .env file
     env_file:
       - .env
     ports:

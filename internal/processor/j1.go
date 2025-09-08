@@ -85,7 +85,7 @@ func getUpstream(req *http.Request, transport *http.Transport) (*ResponseWithHea
 
 	return &ResponseWithHeader{
 		InProgress: false,
-		Expires:    time.Now().Add(time.Duration(randInt(1000, 1500)) * time.Second),
+		Expires:    time.Now().Add(time.Duration(randInt(3600, 7200)) * time.Second), // Increased from 1000-1500 to 3600-7200 seconds (1-2 hours)
 		Body:       body,
 		Header:     res.Header,
 		StatusCode: res.StatusCode,
